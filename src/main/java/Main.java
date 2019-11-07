@@ -62,12 +62,12 @@ public class Main {
         for (int i = 0; i < numberElements; i++) {
             if (distanceA.get(j) < distanceB.get(c)) {
                 numberA++;
-                j++;
                 System.out.println("A: " + distanceA.get(j));
+                j++;
             } else {
                 numberB++;
-                c++;
                 System.out.println("B: " + distanceB.get(c));
+                c++;
             }
         }
         if (numberA > numberB) {
