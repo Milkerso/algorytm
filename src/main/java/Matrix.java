@@ -9,6 +9,8 @@ public class Matrix {
         this.identifier = identifier;
         this.point = point;
     }
+    public Matrix() {
+    }
 
     public String getIdentifier() {
         return identifier;

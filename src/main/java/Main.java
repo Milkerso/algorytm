@@ -31,81 +31,52 @@ public class Main {
         matrixA = getMatrixList(lines, "A");
         matrixB = getMatrixList(lines, "B");
         matrixX = getMatrixList(lines, "X");
-        List<Matrix> matrixListMiA = externalAlgorithm(matrixA, numberElements);
+        System.out.println("hahashahs!");
+        matrixA.forEach(System.out::println);
+        matrixB.forEach(System.out::println);
+
+        List<Matrix> matrixListMiA = externalAlgorithm(new ArrayList<>(matrixA), numberElements);
         List<Matrix> matrixListMiB = externalAlgorithm(matrixB, numberElements);
+        System.out.println("hahashahs!");
+        matrixA.forEach(System.out::println);
+        matrixB.forEach(System.out::println);
         compareMiList(matrixListMiA, matrixListMiB, matrixX, numberElements);
+        matrixA.forEach(System.out::println);
+        matrixB.forEach(System.out::println);
+        matrixA = getMatrixList(lines, "A");
+        matrixB = getMatrixList(lines, "B");
+        matrixX = getMatrixList(lines, "X");
+        fisher(matrixA, matrixB, matrixX);
+
+    }
+
+    private void fisher(List<Matrix> matrixA, List<Matrix> matrixB, List<Matrix> matrixX) {
+
+        double[] tabAverageA = new double[matrixA.get(0).getPoint().length];
+        double[] tabAverageB = new double[matrixB.get(0).getPoint().length];
 
 
+        for (int i = 0; i <matrixA.get(0).getPoint().length; i++) {
+            tabAverageA[i] = avgFeatures(matrixA, i);
+            tabAverageB[i] = avgFeatures(matrixB, i);
+        }
+        Matrix matrixPointA=new Matrix("A",tabAverageA);
+        Matrix matrixPointB= new Matrix("B", tabAverageB);
+        System.out.println();
     }
 
     private void compareMiList(List<Matrix> matrixListMiA, List<Matrix> matrixListMiB, List<Matrix> matrixX, int numberElements) {
-        List<List<Matrix>> matrixListListMiA = new ArrayList<>();
-        List<List<Matrix>> matrixListListMiB = new ArrayList<>();
-        List<List<Double>> distanceA = new ArrayList<>();
-        List<List<Double>> distanceB = new ArrayList<>();
-        for (int i = 0; i < numberElements; i++) {
-            int finalI = i;
-            matrixListListMiA.add(matrixListMiA.stream().filter(matrix -> matrix.getIdentifier().equals(String.valueOf(finalI))).collect(toList()));
-            matrixListListMiB.add(matrixListMiB.stream().filter(matrix -> matrix.getIdentifier().equals(String.valueOf(finalI))).collect(toList()));
-        }
-        matrixListListMiA = matrixListListMiA.stream().filter(matrixList -> !matrixList.isEmpty()).collect(toList());
-        matrixListListMiB = matrixListListMiB.stream().filter(matrixList -> !matrixList.isEmpty()).collect(toList());
-
-        for (int i = 0; i < matrixX.size(); i++) {
-            for (int j = 0; j < matrixListListMiA.size() - 1; j++) {
-                System.out.println("Błąd" + j + "   " + i);
-                distanceA.add(calculateDistance(matrixListListMiA.get(j), matrixListListMiA.get(j + 1), matrixX, 1));
-            }
-        }
-        for (int i = 0; i < matrixX.size(); i++) {
-            for (int j = 0; j < matrixListListMiB.size() - 1; j++) {
-                System.out.println("Błąd" + j + "   " + i);
-                distanceB.add(calculateDistance(matrixListListMiB.get(j), matrixListListMiB.get(j + 1), matrixX, 1));
-            }
-        }
-        List<Double> minDistanceA = new ArrayList<>();
-        for (int i = 0; i < matrixX.size(); i++) {
-            for (int j = 0; j < distanceA.size(); j++) {
-                minDistanceA.add(Collections.min(distanceA.get(j)));
-            }
-        }
-        List<Double> minDistanceB = new ArrayList<>();
-        for (int i = 0; i < matrixX.size(); i++) {
-            for (int j = 0; j < distanceB.size(); j++) {
-                minDistanceB.add(Collections.min(distanceB.get(j)));
-            }
-        }
-        if (Collections.min(minDistanceA) > Collections.min(minDistanceB)) {
-            System.out.println("Nalezy do B");
-        } else {
-            System.out.println("Nalezy do A");
-        }
-
-//        System.out.println(Collections.min(distance.keySet()));
+        matrixListMiA.forEach(System.out::println);
+        matrixListMiB.forEach(System.out::println);
+        calculateDistance(matrixListMiA, matrixListMiB, matrixX, numberElements);
     }
 
-    private List<Matrix> externalAlgorithm(List<Matrix> matrixList, int numberElements) {
-        List<Matrix> randElements = new ArrayList<>();
-//        for (int i = 0; i < numberElements; i++) {
-//            int randomNumber = generator.nextInt(matrix.size());
-//            randElements.add(matrix.get(randomNumber));
-//            matrix.remove(randomNumber);
-//        }
-//        randElements.forEach(System.out::println);
-//        System.out.println();
-//        matrix.forEach(System.out::println);
-        randElements.add(matrixList.get(matrixList.size() - 1));
-        randElements.add(matrixList.get(matrixList.size() - 2));
-        randElements.add(matrixList.get(matrixList.size() - 3));
+    private List<Matrix> externalAlgorithm(List<Matrix> miList, int numberElements) {
+        List<Matrix> randElements = randKElements(numberElements, miList);
         List<Matrix> randElementsFinal = new ArrayList<>(randElements);
-        matrixList.remove(matrixList.size() - 1);
-        matrixList.remove(matrixList.size() - 1);
-        matrixList.remove(matrixList.size() - 1);
         boolean firstTime = true;
-        List<String> identifierEmptyList = new ArrayList<>();
-        List<Matrix> miList = matrixList;
-        List<Matrix> miListTemp = new ArrayList<>(miList);
-        List<Matrix> randElementsEnded = new ArrayList<>(randElements);
+        List<Matrix> miListTemp;
+        List<Matrix> randElementsEnded;
 
         int j = 0;
         do {
@@ -116,10 +87,13 @@ public class Main {
             System.out.println(randElements.size() + "dadadas");
             randElements = calculateAvgForMiList(randElements, miList);
             randElements.forEach(System.out::println);
+            System.out.println("Nowa mi");
+            miList.forEach(System.out::println);
+            System.out.println("Koniec mi ");
             j++;
         } while (isEnd(miList, miListTemp, randElements, randElementsEnded));
         System.out.println(j + "taki rozmiar");
-        return miList;
+        return randElements;
     }
 
     private boolean isEnd(List<Matrix> miList, List<Matrix> miListTemp, List<Matrix> randElements, List<Matrix> randElementsEnded) {
@@ -130,7 +104,7 @@ public class Main {
         }
         for (int i = 0; i < randElements.size(); i++) {
             for (int j = 0; j < randElements.get(0).getPoint().length; j++) {
-                if (Math.abs(randElements.get(i).getPoint()[j] - randElementsEnded.get(i).getPoint()[j]) > 0.1) {
+                if (Math.abs(randElements.get(i).getPoint()[j] - randElementsEnded.get(i).getPoint()[j]) > 0.001) {
                     return true;
                 }
             }
@@ -245,10 +219,9 @@ public class Main {
         return sum / matrix.size();
     }
 
-    private List<Double> calculateDistance(List<Matrix> matrixA, List<Matrix> matrixB, List<Matrix> matrixX, int numberElements) {
+    private void calculateDistance(List<Matrix> matrixA, List<Matrix> matrixB, List<Matrix> matrixX, int numberElements) {
         List<Double> distanceA = new ArrayList<>();
         List<Double> distanceB = new ArrayList<>();
-        List<Double> distance = new ArrayList<>();
         for (Matrix X : matrixX) {
             for (Matrix A : matrixA) {
                 distanceA.add(getDistance(A.getPoint(), X.getPoint()));
@@ -257,16 +230,10 @@ public class Main {
                 distanceB.add(getDistance(B.getPoint(), X.getPoint()));
             }
             compareMatrix(distanceA, distanceB, X);
-            if (Collections.min(distanceA) > Collections.min(distanceB)) {
-                distance.add(Collections.min(distanceB));
-            } else {
-                distance.add(Collections.min(distanceA));
-            }
             compareMatrixForKNumberElements(distanceA, distanceB, X, numberElements);
             distanceA = new ArrayList<>();
             distanceB = new ArrayList<>();
         }
-        return distance;
     }
 
     private void compareMatrixForKNumberElements(List<Double> distanceA, List<Double> distanceB, Matrix matrixX, int numberElements) {
