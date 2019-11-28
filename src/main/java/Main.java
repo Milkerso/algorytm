@@ -1,5 +1,6 @@
 import java.awt.image.AreaAveragingScaleFilter;
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -43,9 +44,11 @@ public class Main {
         compareMiList(matrixListMiA, matrixListMiB, matrixX, numberElements);
         matrixA.forEach(System.out::println);
         matrixB.forEach(System.out::println);
+        lines = this.getDataFisher();
         matrixA = getMatrixList(lines, "A");
         matrixB = getMatrixList(lines, "B");
         matrixX = getMatrixList(lines, "X");
+
         fisher(matrixA, matrixB, matrixX);
 
     }
@@ -55,14 +58,35 @@ public class Main {
         double[] tabAverageA = new double[matrixA.get(0).getPoint().length];
         double[] tabAverageB = new double[matrixB.get(0).getPoint().length];
 
-
-        for (int i = 0; i <matrixA.get(0).getPoint().length; i++) {
+        for (int i = 0; i < matrixA.get(0).getPoint().length; i++) {
             tabAverageA[i] = avgFeatures(matrixA, i);
             tabAverageB[i] = avgFeatures(matrixB, i);
         }
-        Matrix matrixPointA=new Matrix("A",tabAverageA);
-        Matrix matrixPointB= new Matrix("B", tabAverageB);
-        System.out.println();
+        Matrix matrixPointA = new Matrix("A", tabAverageA);
+        Matrix matrixPointB = new Matrix("B", tabAverageB);
+        System.out.println(matrixPointB);
+        double[] tabFiA = fisherCalculate(matrixA, matrixPointA);
+        double[] tabFiB = fisherCalculate(matrixB, matrixPointB);
+        Arrays.stream(tabFiA).forEach(System.out::println);
+        Arrays.stream(tabFiB).forEach(System.out::println);
+        double[] tabFi = new double[matrixA.get(0).getPoint().length];
+        for (int i = 0; i < matrixA.get(0).getPoint().length; i++) {
+            tabFi[i] = (Math.abs(tabAverageA[i]-tabAverageB[i]))/(tabFiB[i]+tabFiA[i]);
+        }
+        Arrays.stream(tabFi).forEach(System.out::println);
+        System.out.println(Collections.max(Arrays.stream(tabFi).boxed().collect(toList())));
+    }
+
+    private double[] fisherCalculate(List<Matrix> matrixList, Matrix matrix) {
+        double[] tabFi = new double[matrix.getPoint().length];
+        for (int i = 0; i < matrix.getPoint().length; i++) {
+            tabFi[i] = 0;
+            for (Matrix m : matrixList) {
+                tabFi[i] = tabFi[i] + (Math.pow(m.getPoint()[i] - matrix.getPoint()[i], 2));
+            }
+            tabFi[i] = tabFi[i] / matrixList.size();
+        }
+        return tabFi;
     }
 
     private void compareMiList(List<Matrix> matrixListMiA, List<Matrix> matrixListMiB, List<Matrix> matrixX, int numberElements) {
@@ -276,6 +300,12 @@ public class Main {
 
     private List<String> getData() {
         Path filePath = Paths.get(this.getClass().getResource("daneTemp.txt").getPath());
+        System.out.println(filePath);
+        return readFile(filePath);
+    }
+
+    private List<String> getDataFisher() {
+        Path filePath = Paths.get(this.getClass().getResource("daneTempFisher.txt").getPath());
         System.out.println(filePath);
         return readFile(filePath);
     }
